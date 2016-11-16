@@ -15,3 +15,4 @@ Rainy	Mild	Normal	True	Yes
 Overcast	Mild	High	True	Yes
 Overcast	Hot	Normal	False	Yes
 Sunny	Mild	High	True	No
+PlayGolf
