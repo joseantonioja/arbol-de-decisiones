@@ -105,20 +105,20 @@ public class TreeGenerator{
 		return gains;
 	}
 	/*Construye el arbol resultado de id3*/
-	private static void id3(ArrayList<String> input, int visitedAttributes[], String output, ArrayList< ArrayList <String> > table, Tree t, String father){
-		int indexO = input.indexOf(output);
+	private static void id3(ArrayList<String> input, int visitedAttributes[], int indexO, ArrayList< ArrayList <String> > table, Tree t, int father){
 		boolean equalO = true;
+		int node;
 		//Si la tabla es vacia
 		if(table.size()==0){
 			System.out.println("Failure");
-			t.addEdge(father, "Failure");
 			return;
 		}
 		//Si todos los registros tienen el mismo valor para el atributo output
 		for(int i=1; i<table.size(); i++)
 			equalO = equalO && (table.get(i).get(indexO).equals(table.get(i-1).get(indexO)));
 		if(equalO){
-			t.addEdge(father, table.get(0).get(indexO));
+			node = t.addNode(table.get(0).get(indexO));
+			t.addEdge(father, node);
 			return;
 		}
 		//Si ya no hay atributos a analizar
@@ -126,7 +126,8 @@ public class TreeGenerator{
 		for(int i=0; i<visitedAttributes.length; i++)
 			counter += visitedAttributes[i];
 		if(counter==visitedAttributes.length-1){
-			t.addEdge(father, mostFrequent(table, indexO));
+			node = t.addNode(mostFrequent(table, indexO));
+			t.addEdge(father, node);
 			return;
 		}
 		//Si no se cumplen las anteriores, se determinan las ganancias respecto a atributo en la posicion indexO
@@ -155,11 +156,11 @@ public class TreeGenerator{
 				visited.add(tmp);
 		}
 		/*Se agrega un nodo al arbol t con etiqueta xAttr*/
-		t.addNode(xAttr);
-		if(father==null)
+		int newFather = t.addAttribute(xAttr);
+		if(father==-1)
 			t.root = xAttr;
 		else
-			t.addEdge(father, xAttr);
+			t.addEdge(father, newFather);
 		System.out.println(xAttr+" fue seleccionado");
 		/*Se particiona la informacion en tablas mas pequeñas de acuerdo a las instancias de xAttr*/
 		for(int j=0; j<visited.size(); j++){
@@ -170,18 +171,19 @@ public class TreeGenerator{
 					newTable.add(table.get(i));
 			}
 			/*Se agrega un nodo al arbol t*/
-			t.addNode(instance);
+			node = t.addNode(instance);
 			/*Se agrega una arista del atributo a su instancia*/
-			t.addEdge(xAttr, instance);
+			t.addEdge(newFather, node);
 			/*Se llama de nuevo a id3 con esa nueva tabla*/
-			id3(input, visitedAttributes, output, newTable, t, instance);
+			id3(input, visitedAttributes, indexO, newTable, t, node);
 		}
 	}
 	/*Regresa el arbol resultado de correr id3 con los atributos attr, el atributo de interes(que sera clasificado) sobre una tabla de hechos*/
 	public static Tree runId3(ArrayList<String> attr, String output, ArrayList<ArrayList<String>> table){
 		Tree t = new Tree();
+		int indexO = attr.indexOf(output);
 		int visitedAttributes[] = new int[attr.size()];
-		id3(attr, visitedAttributes, output, table, t, null);
+		id3(attr, visitedAttributes, indexO, table, t, -1);
 		return t;
 	}
 	public static void main(String[] args){
