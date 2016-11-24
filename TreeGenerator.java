@@ -180,7 +180,7 @@ public class TreeGenerator{
 	}
 	/*Regresa el arbol resultado de correr id3 con los atributos attr, el atributo de interes(que sera clasificado) sobre una tabla de hechos*/
 	public static Tree runId3(ArrayList<String> attr, String output, ArrayList<ArrayList<String>> table){
-		Tree t = new Tree();
+		Tree t = new Tree(output);
 		int indexO = attr.indexOf(output);
 		int visitedAttributes[] = new int[attr.size()];
 		id3(attr, visitedAttributes, indexO, table, t, -1);
@@ -217,7 +217,14 @@ public class TreeGenerator{
 				System.out.println(a);
 			System.out.println("Atributo de interes "+interestAttribute);
 			Tree t = TreeGenerator.runId3(attr, interestAttribute, facts);
+			System.out.println("****************************************************");
+			System.out.println("Árbol de decisión: ");
 			System.out.println(t);
+			System.out.println("****************************************************");
+			System.out.println("Reglas inferidas de ese árbol: ");
+			ArrayList<String> rules = t.getRules();
+			for(int i=0; i<rules.size(); i++)
+				System.out.println("R"+(i+1) +": " + rules.get(i));
 		}
 		catch(Exception e){
 			e.printStackTrace();
